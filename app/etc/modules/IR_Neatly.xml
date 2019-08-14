@@ -1,0 +1,19 @@
+<?xml version="1.0"?>
+<!--
+/**
+ * Module initial config
+ *
+ * @author iResources
+ */
+-->
+<config>
+    <modules>
+        <IR_Neatly>
+            <active>true</active>
+            <codePool>community</codePool>
+            <depends>
+                <Mage_Adminhtml />
+            </depends>
+        </IR_Neatly>
+    </modules>
+</config>

@@ -1,0 +1,30 @@
+<config>
+    <modules>
+        <IR_Neatly>
+            <version>0.1.0</version>
+        </IR_Neatly>
+    </modules>
+    <global>
+        <models>
+            <ir_neatly>
+                <class>IR_Neatly_Model</class>
+            </ir_neatly>
+        </models>
+        <helpers>
+            <ir_neatly>
+                <class>IR_Neatly_Helper</class>
+            </ir_neatly>
+        </helpers>
+    </global>
+    <frontend>
+        <routers>
+            <neatly>
+                <use>standard</use>
+                <args>
+                    <module>IR_Neatly</module>
+                    <frontName>neatly</frontName>
+                </args>
+            </neatly>
+        </routers>
+    </frontend>
+</config>

@@ -1,15 +1,13 @@
 <?xml version="1.0"?>
 <package>
     <name>IR_Neatly_Reporting</name>
-    <version>1.0.0.2</version>
+    <version>1.0.1.0</version>
     <stability>stable</stability>
     <license uri="http://www.gnu.org/copyleft/gpl.html">GNU General Public License (GPL)</license>
     <channel>community</channel>
     <extends/>
     <summary>View a range of detailed reports about your sales, products and customers from your Neatly dashboard.</summary>
-    <description>This extension allows Neatly to pull and generate detailed reports about your sales, customers and products.&#xD;
-&#xD;
-Simply install the extension and enter your API key and you will be able to view the following data:&#xD;
+    <description>Simply install the extension and enter your API key and you will be able to view the following data:&#xD;
 &#xD;
 &lt;ul&gt;&#xD;
 &lt;li&gt;Sales Overview&lt;/li&gt;&#xD;
@@ -25,11 +23,11 @@ Simply install the extension and enter your API key and you will be able to view
 &lt;/ul&gt;&#xD;
 &#xD;
 You can also compare data against previous period of custom your date range comparison.</description>
-    <notes>Initial extension release.</notes>
+    <notes>This latest release allows the extension to now support PHP 5.4.0</notes>
     <authors><author><name>Jon Leigton</name><user>iResources</user><email>j.leighton@i-resources.co.uk</email></author></authors>
-    <date>2015-05-21</date>
-    <time>13:53:24</time>
-    <contents><target name="mageetc"><dir name="app"><file name="etc" hash=""/></dir></target></contents>
+    <date>2015-06-03</date>
+    <time>11:05:27</time>
+    <contents><target name="magecommunity"><dir name="IR"><dir name="Neatly"><dir name="Exception"><file name="Api.php" hash="079a77634e425c151fcc97e9d67a2ebf"/></dir><dir name="Helper"><file name="Data.php" hash="ad424a7ecee2e205356678d233908207"/></dir><dir name="Model"><dir name="Reports"><file name="Abstract.php" hash="5b908c879ffa6974085fedb19b530959"/><file name="Customers.php" hash="f6af2cf717dbb7d121d643d1171d6ccf"/><file name="Reporting.php" hash="1415934625ff2b9963d3d87cf1851201"/><file name="Sales.php" hash="6b0fb8adb0ec9cbf283508fe59adb797"/></dir></dir><dir name="controllers"><file name="IndexController.php" hash="a419ada141895a71c2337aa4e10ac24d"/></dir><dir name="etc"><file name="adminhtml.xml" hash="98b2b738856967354adade75f1830a9c"/><file name="config.xml" hash="33268e3951cce566d47534e7114cbe60"/><file name="system.xml" hash="3f13f3b44d36643f8bb9822a64ce4c29"/></dir><file name=".DS_Store" hash="601020d0d1c6b7a09b8efd396666f583"/></dir></dir></target><target name="mageetc"><dir name="modules"><file name="IR_Neatly.xml" hash="8cfc6d5b71ff25155628d065d6a7335b"/></dir></target></contents>
     <compatible/>
-    <dependencies><required><php><min>5.6.8</min><max>5.6.9</max></php></required></dependencies>
+    <dependencies><required><php><min>5.4.0</min><max>5.6.9</max></php></required></dependencies>
 </package>
