@@ -1,4 +1,20 @@
 <?php
+function print_d()
+{
+    echo "<pre>\n";
+    foreach (func_get_args() as $object) {
+        if (is_null($object)) {
+            var_dump($object);
+        } else {
+            print_r($object);
+        }
+        echo "\n";
+    }
+    echo "</pre>";
+    exit;
+}
+
+use IR_Neatly_Exception_Api as ApiException;
 
 class IR_Neatly_Model_Reports_Reporting extends IR_Neatly_Model_Reports_Abstract
 {
@@ -244,6 +260,229 @@ class IR_Neatly_Model_Reports_Reporting extends IR_Neatly_Model_Reports_Abstract
     }
 
     /**
+     * Get sales statistics by type.
+     *
+     * @param array $options
+     * @return array
+     */
+    public function getSalesByTypeStats($options = array())
+    {
+        $options = array_merge(array(
+            'sku' => '',
+            'category' => '',
+            'manufacturer' => '',
+            'date_format' => 'Y-m-d',
+            'status' => 'complete',
+            'group' => false,
+            'categories' => array(),
+            'attributes' => array(),
+        ), $this->options, $options);
+
+        $c = Mage::getSingleton('core/resource')->getConnection('default_write');
+
+        $onWhere = array();
+
+        if ($options['from']) {
+            $onWhere[] = sprintf('DATE(sfoi.created_at) >= %s', $c->quote($this->options['from']));
+        }
+
+        if ($options['to']) {
+            $onWhere[] = sprintf('DATE(sfoi.created_at) <= %s', $c->quote($this->options['to']));
+        }
+
+        $collection = Mage::getModel('catalog/product')->getCollection()
+            ->joinTable(
+                array('sfoi' => 'sales/order_item'),
+                'product_id = entity_id',
+                array('p_id' => 'product_id'),
+                implode(" AND ", $onWhere) ?: null
+            );
+
+
+        $query = $collection->getSelect();
+
+        // if sku set.
+        if ($options['sku']) {
+            $query->where('sfoi.sku = ?', $options['sku']);
+        } else {
+            // join any attributes and categories set.
+            $this->joinAttributes($query, $options['attributes'])
+                 ->joinCategories($query, $options['categories']);
+        }
+
+        if ($options['status']) {
+            $salesOrderTbl = $this->resource->getTableName('sales/order');
+            $query->join(array('sfo' => $salesOrderTbl), 'sfo.entity_id = sfoi.order_id', array())
+                  ->where('`sfo`.`status` = ?', $options['status']);
+        }
+
+        $columns = array(
+            'total_count' => 'SUM(`sfoi`.`qty_ordered`)',
+            'total_value' => 'SUM(`sfoi`.`row_total_incl_tax`)',
+        );
+
+        if ($options['group']) {
+            $columns['date'] = sprintf('DATE_FORMAT(`sfoi`.`created_at`, "%s")', $options['date_format']);
+            $query->group($columns['date']);
+        }
+
+        // reset columns.
+        $query->reset(Zend_Db_Select::COLUMNS)
+              ->columns($columns);
+
+        $data = $collection->getData();
+
+        if (!$options['group']) {
+            return array(
+                'total_count' => $data[0]['total_count'] ?: 0,
+                'total_value' => $data[0]['total_value'] ?: 0,
+            );
+        }
+
+        $dateRange = $this->getDates($options['from'], $options['to'], $options['group_by']);
+
+        return $this->datesCombine($dateRange, $data, array_keys($columns));
+    }
+
+    /**
+     * Get an array of attributes and their acceptable values.
+     *
+     * @return array
+     */
+    public function getProductAttributes()
+    {
+        $query = Mage::getResourceModel('catalog/product_attribute_collection')->getSelect();
+
+        $query->where('frontend_input = ?', 'select')
+              ->order('frontend_label ASC');
+
+        $columns = array(
+            'id' => 'attribute_id',
+            'code' => 'attribute_code',
+            'label' => 'frontend_label',
+        );
+
+        // reset columns.
+        $query->reset(Zend_Db_Select::COLUMNS)
+              ->columns($columns);
+
+        return $this->readConnection->fetchAll($query);
+    }
+
+    /**
+     * Get a product attribute and a collection of it's acceptable values.
+     *
+     * @param int $id
+     * @return stdClass
+     */
+    public function getProductAttribute($code)
+    {
+        $attr = $this->getAttribute($code);
+
+        return (object)array(
+            'id' => $attr->getAttributeId(),
+            'code' => $attr->getAttributeCode(),
+            'label' => $attr->getFrontendLabel(),
+            'options' => $attr->getSource()->getAllOptions(false),
+        );
+    }
+
+    /**
+     * Get product categories.
+     *
+     * @param array $options
+     * @return array
+     */
+    public function getCategories($options = array())
+    {
+        $options = array_merge(array(
+            'store_id' => null,
+        ), $this->options, $options);
+
+        // new query.
+        $query = $this->readConnection->select();
+
+        $cceTable = $this->resource->getTableName('catalog/category');
+        $ccevTable = Mage::getConfig()->getTablePrefix() . 'catalog_category_entity_varchar';
+        // get category name attribute id.
+        $attributeId = $this->getCategoryNameAttributeId();
+
+        $columns = array(
+            'id' => 'entity_id',
+            'level',
+        );
+
+        $query->from(array('cce' => $cceTable), $columns)
+              ->join(
+                    array('ccev' => $ccevTable),
+                    implode(' AND ', array(
+                        "`ccev`.`entity_id` = `cce`.`entity_id`",
+                        "`ccev`.`attribute_id`={$attributeId}",
+                        sprintf("`ccev`.`store_id` = %d", (int)$options['store_id'])
+                    )),
+                    array('name' => 'value')
+                )
+              ->order('path ASC');
+
+        $cats = $this->readConnection->fetchAll($query);
+
+        return $this->buildCatTree($cats);
+    }
+
+    /**
+     * Get product by sku.
+     *
+     * @param string $sku
+     * @return stdClass|null
+     */
+    public function getProductBySku($sku)
+    {
+        if (!$product = Mage::getModel('catalog/product')->loadByAttribute('sku', $sku)) {
+            // throw new ApiException(sprintf('Product "%s" not found', $sku), 400);
+            return "404";
+        }
+
+        return array(
+            'sku' => $product->getSku(),
+            'name' => $product->getName(),
+            'price' => $product->getPrice(),
+            'short_description' => $product->getShortDescription(),
+            'url' => $product->getProductUrl(),
+            'img' => array(
+                'regular' => $product->getImageUrl(),
+                'thumbnail' => $product->getThumbnailUrl()
+            )
+        );
+    }
+
+    /**
+     * Build category tree.
+     *
+     * @param array $cats
+     * @return array
+     */
+    protected function buildCatTree(&$cats)
+    {
+        $cat = (object)array_shift($cats);
+
+        $cat->children = array();
+
+        if (isset($this->lastCat[$cat->level - 1])) {
+            $this->lastCat[$cat->level - 1]->children[] = $cat;
+        } else {
+            $this->tree[] = $cat;
+        }
+
+        $this->lastCat[$cat->level] = $cat;
+
+        if ($cats) {
+            $this->buildCatTree($cats);
+        }
+
+        return $this->tree;
+    }
+
+    /**
      * Check to see whether the passed comparison operator is valid.
      *
      * @param string $operator
@@ -266,5 +505,128 @@ class IR_Neatly_Model_Reports_Reporting extends IR_Neatly_Model_Reports_Abstract
         }
 
         return $operator;
+    }
+
+
+    /**
+     * Join categories to select query.
+     *
+     * @param Varien_Db_Select $query
+     * @param array $categories
+     * @return self
+     */
+    protected function joinCategories($query, $categories = array())
+    {
+        // if no categories set.
+        if (!is_array($categories) || empty($categories)) {
+            return $this;
+        }
+
+        // get table names.
+        $ccpTable = $this->resource->getTableName('catalog/category_product');
+        $cceTable = $this->resource->getTableName('catalog/category');
+        $ccevTable = Mage::getConfig()->getTablePrefix() . 'catalog_category_entity_varchar';
+        // get "category name" attribute id.
+        $attributeId = $this->getCategoryNameAttributeId();
+
+        $query->join(array('ccp' => $ccpTable), '`ccp`.`product_id` = `e`.`entity_id`', array())
+              ->join(array('cce' => $cceTable), '`cce`.`entity_id` = `ccp`.`category_id`', array())
+              ->join(
+                    array('ccev' => $ccevTable),
+                    "`ccev`.`entity_id` = `cce`.`entity_id` AND `ccev`.`attribute_id`={$attributeId}",
+                    array()
+                )
+              ->where('`ccp`.`category_id` IN(?)', $categories);
+
+        return $this;
+    }
+
+    /**
+     * Join attributes to select query.
+     *
+     * @param Varien_Db_Select $query
+     * @param array $attributes
+     * @return self
+     */
+    protected function joinAttributes($query, $attributes = array())
+    {
+        $c = Mage::getSingleton('core/resource')->getConnection('default_write');
+
+        $attributes = is_array($attributes) ? $attributes : array();
+
+        foreach ($attributes as $code => $value) {
+            // escape value
+            $value = $c->quote($value);
+
+            // get attriubte.
+            $attr = $this->getAttribute($code);
+            $alias = "{$code}_table";
+            $aliasEaov = "{$alias}_eaov";
+
+            // join attribute
+            $query->join(
+                array($alias => $attr->getBackendTable()),
+                "product_id = {$alias}.entity_id AND {$alias}.attribute_id={$attr->getId()}",
+                array($code => 'value')
+            );
+
+            $query->join(
+                array($aliasEaov => 'eav_attribute_option_value'),
+                sprintf(
+                    "{$aliasEaov}.option_id = {$alias}.value AND {$aliasEaov}.value = %s AND {$aliasEaov}.store_id = %d",
+                    $value,
+                    $this->options['store_id']
+                ),
+                array()
+            );
+        }
+
+        return $this;
+    }
+
+    /**
+     * Get an attribute.
+     *
+     * @param string $code
+     * @return Mage_Catalog_Model_Resource_Eav_Attribute
+     * @throws IR_Neatly_Exception_Api
+     */
+    protected function getAttribute($code)
+    {
+        $attr = Mage::getSingleton('eav/config')
+                    ->getAttribute(Mage_Catalog_Model_Product::ENTITY, $code);
+
+        // if attribute does not exist.
+        if (!$attr || !$attr->getId()) {
+            throw new ApiException(sprintf('"%s" is not a valid attribute.', $code), 400);
+        }
+
+        $attr->setStoreId($this->options['store_id']);
+
+        return $attr;
+    }
+
+    /**
+     * Get the ID of the category name attribute.
+     *
+     * @return int
+     */
+    protected function getCategoryNameAttributeId()
+    {
+        $eavAttributeTbl = $this->resource->getTableName('eav/attribute');
+        $eavEntityTypeTbl = $this->resource->getTableName('eav/entity_type');
+        $query = $this->readConnection->select();
+        $query->from(array('eat' => $eavEntityTypeTbl), array());
+        $query->join(array('ea' => $eavAttributeTbl), 'ea.entity_type_id = eat.entity_type_id', array('attribute_id'));
+        $query->where('eat.entity_type_code = ?', 'catalog_category');
+        $query->where('ea.attribute_code = ?', 'name');
+
+        $data = $this->readConnection->fetchAll($query);
+
+        if (!isset($data[0]['attribute_id'])) {
+            throw new Exception("Could not find category name attribute ID.");
+        }
+
+        return (int)$data[0]['attribute_id'];
     }
 }

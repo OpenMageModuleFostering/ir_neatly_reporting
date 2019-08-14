@@ -6,7 +6,7 @@
  */
 class IR_Neatly_Helper_Data extends Mage_Core_Helper_Data
 {
-    const VERSION = '1.0.0.2';
+    const VERSION = '1.1.0.0';
 
     /**
      * Checks whether JSON can be rendered at the /neatly endpoint.

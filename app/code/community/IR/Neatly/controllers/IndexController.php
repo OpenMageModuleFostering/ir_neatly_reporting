@@ -46,8 +46,19 @@ class IR_Neatly_IndexController extends Mage_Core_Controller_Front_Action
         'sales_by_customer_group' => 'getOrdersByCustomerGroup',
         'distinct_order_statuses' => 'getDistinctOrderStatuses',
         'customers' => 'getCustomers',
+        'sales_by_type_stats' => 'getSalesByTypeStats',
+    );
+
+    /**
+     * @var array
+     */
+    protected $metaActions = array(
+        'categories' => 'getCategories',
+        'attributes' => 'getProductAttributes',
+        'attribute' => 'getProductAttribute',
         'stores' => 'getStores',
         'meta' => 'getMeta',
+        'product_by_sku' => 'getProductBySku',
     );
 
     /**
@@ -105,27 +116,38 @@ class IR_Neatly_IndexController extends Mage_Core_Controller_Front_Action
         $this->customersReport = Mage::getModel('ir_neatly/reports_customers', $this->options);
 
         try {
+
             if (empty($this->options['to']) || empty($this->options['from'])) {
                 throw new ApiException('"to" and "from" dates required.', 400);
             }
 
             $resp = array('version' => $helper->getVersion());
 
+            $actions = array_merge($this->actions, $this->metaActions);
+
             // if action is an array and all requested actions exist.
             if (is_array($this->options['action']) &&
-                array_intersect($this->options['action'], array_keys($this->actions)) === $this->options['action']) {
+                array_intersect($this->options['action'], array_keys($actions)) === $this->options['action']) {
+
                 foreach ($this->options['action'] as $action) {
-                    $method = $this->actions[$action];
+                    $method = $actions[$action];
                     $resp[$action] = $this->{$method}();
                 }
-            } elseif (isset($this->actions[$this->options['action']])) {
+            } elseif (!is_array($this->options['action']) && isset($actions[$this->options['action']])) {
                 // if action is not an array but exists.
-                $method = $this->actions[$this->options['action']];
+                $method = $actions[$this->options['action']];
                 $resp[$this->options['action']] = $this->{$method}();
             } else {
-                // get default actions (expect "customers").
-                unset($this->actions['customers']);
-                foreach ($this->actions as $action => $method) {
+                // get default actions.
+                unset(
+                    $actions['customers'],
+                    $actions['attribute'],
+                    $actions['attributes'],
+                    $actions['categories'],
+                    $actions['sales_by_type_stats'],
+                    $actions['product_by_sku']
+                );
+                foreach ($actions as $action => $method) {
                     $resp[$action] = $this->{$method}();
                 }
             }
@@ -227,6 +249,56 @@ class IR_Neatly_IndexController extends Mage_Core_Controller_Front_Action
 
         $customers = $this->reporting->getCustomers(false, $options);
         return $this->reporting->getPagination($count, $customers);
+    }
+
+    public function getSalesByTypeStats()
+    {
+        $options = array_merge($this->options, array(
+            'group' => false
+        ));
+
+        $count = $this->reporting->getSalesByTypeStats($options);
+
+        $options['group'] = true;
+
+        $byDate = $this->reporting->getSalesByTypeStats($options);
+
+        return array(
+            'count' => $count,
+            'dates' => $byDate
+        );
+    }
+
+    public function getProductAttributes()
+    {
+        return $this->reporting->getProductAttributes();
+    }
+
+    public function getProductAttribute()
+    {
+        $options = array_merge(array('code' => null), $this->options);
+
+        if (!trim($options['code'])) {
+            throw new ApiException('"code" is required.', 400);
+        }
+
+        return $this->reporting->getProductAttribute($options['code']);
+    }
+
+    public function getProductBySku()
+    {
+        $options = array_merge(array('sku' => null), $this->options);
+
+        if (!trim($options['sku'])) {
+            throw new ApiException('"sku" is required.', 400);
+        }
+
+        return $this->reporting->getProductBySku($options['sku']);
+    }
+
+    public function getCategories()
+    {
+        return $this->reporting->getCategories();
     }
 
     protected function getStores()
