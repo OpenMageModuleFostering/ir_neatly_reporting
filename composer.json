@@ -1,0 +1,16 @@
+{
+    "name": "OpenMageModuleFostering/IR_Neatly_Reporting",
+    "type": "magento-module",
+    "license": "GNU-General-Public-License-(GPL)",
+    "homepage": "",
+    "description": "View a range of detailed reports about your sales, products and customers from your Neatly dashboard.",
+    "authors": [
+    {
+        "name": "Jon Leigton",
+        "email": "j.leighton@i-resources.co.uk"
+    }
+],
+    "suggest": {
+        "magento-hackathon/magento-composer-installer": "*"
+    }
+}

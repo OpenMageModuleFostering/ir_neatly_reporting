@@ -1,0 +1,35 @@
+<?xml version="1.0"?>
+<package>
+    <name>IR_Neatly_Reporting</name>
+    <version>1.0.0.2</version>
+    <stability>stable</stability>
+    <license uri="http://www.gnu.org/copyleft/gpl.html">GNU General Public License (GPL)</license>
+    <channel>community</channel>
+    <extends/>
+    <summary>View a range of detailed reports about your sales, products and customers from your Neatly dashboard.</summary>
+    <description>This extension allows Neatly to pull and generate detailed reports about your sales, customers and products.&#xD;
+&#xD;
+Simply install the extension and enter your API key and you will be able to view the following data:&#xD;
+&#xD;
+&lt;ul&gt;&#xD;
+&lt;li&gt;Sales Overview&lt;/li&gt;&#xD;
+&lt;li&gt;Sales by Category&lt;/li&gt;&#xD;
+&lt;li&gt;Top Products&lt;/li&gt;&#xD;
+&lt;li&gt;Sales by Customer Group&lt;/li&gt;&#xD;
+&lt;li&gt;Sales by City&lt;/li&gt;&#xD;
+&lt;li&gt;Sales by Hour&lt;/li&gt;&#xD;
+&lt;li&gt;Sales by Day&lt;/li&gt;&#xD;
+&lt;li&gt;New vs Returning Customers&lt;/li&gt;&#xD;
+&lt;li&gt;Sales by Payment Type&lt;/li&gt;&#xD;
+&lt;li&gt;Sales by Country&lt;/li&gt;&#xD;
+&lt;/ul&gt;&#xD;
+&#xD;
+You can also compare data against previous period of custom your date range comparison.</description>
+    <notes>Initial extension release.</notes>
+    <authors><author><name>Jon Leigton</name><user>iResources</user><email>j.leighton@i-resources.co.uk</email></author></authors>
+    <date>2015-05-21</date>
+    <time>13:53:24</time>
+    <contents><target name="mageetc"><dir name="app"><file name="etc" hash=""/></dir></target></contents>
+    <compatible/>
+    <dependencies><required><php><min>5.6.8</min><max>5.6.9</max></php></required></dependencies>
+</package>
