@@ -289,7 +289,8 @@ class IR_Neatly_Model_Reports_Reporting extends IR_Neatly_Model_Reports_Abstract
 
         // if sku set.
         if ($options['sku']) {
-            $query->where('sfoi.sku = ?', $options['sku']);
+            #$query->where('sfoi.sku = ?', $options['sku']);
+            $query->where('sfoi.sku LIKE ?', "{$options['sku']}%");
         } else {
             // join any attributes and categories set.
             $this->joinAttributes($query, $options['attributes'])
