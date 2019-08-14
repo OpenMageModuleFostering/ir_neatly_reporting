@@ -29,13 +29,22 @@
                         <comment>
                         <![CDATA[Your neatly.io API Token.]]>
                         </comment>
-                        <sort_order>20</sort_order>
+                        <sort_order>1</sort_order>
                         <show_in_default>1</show_in_default>
                         <show_in_website>0</show_in_website>
                         <show_in_store>0</show_in_store>
                         <can_be_empty>0</can_be_empty>
                         <backend_model>adminhtml/system_config_backend_encrypted</backend_model>
                     </neatly_api_token>
+                    <version translate="label">
+                        <label>Extension Version No.</label>
+                        <frontend_type>select</frontend_type>
+                        <frontend_model>IR_Neatly_Block_Adminhtml_Version</frontend_model>
+                        <sort_order>2</sort_order>
+                        <show_in_default>1</show_in_default>
+                        <show_in_website>0</show_in_website>
+                        <show_in_store>0</show_in_store>
+                    </version>
                 </fields>
             </security>
         </groups>

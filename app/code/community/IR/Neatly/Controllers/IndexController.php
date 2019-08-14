@@ -47,6 +47,7 @@ class IR_Neatly_IndexController extends Mage_Core_Controller_Front_Action
         'distinct_order_statuses' => 'getDistinctOrderStatuses',
         'customers' => 'getCustomers',
         'sales_by_type_stats' => 'getSalesByTypeStats',
+        'export' => 'getExport',
     );
 
     /**
@@ -100,22 +101,22 @@ class IR_Neatly_IndexController extends Mage_Core_Controller_Front_Action
             'page' => true,
         ), $this->getRequest()->getParams());
 
-        $this->salesReport = Mage::getModel('ir_neatly/reports_sales', $this->options);
-
-        $this->reporting = Mage::getModel('ir_neatly/reports_reporting', $this->options);
-
-        // get all stores.
-        $this->stores = $this->salesReport->getStores();
-
-        // if only 1 store returned or no store_id passed in request.
-        if (count($this->stores) == 1 || empty($this->options['store_id'])) {
-            $this->options['store_id'] = $this->stores[0]->id;
-        }
-
-        $this->salesReport->setOptions($this->options);
-        $this->customersReport = Mage::getModel('ir_neatly/reports_customers', $this->options);
-
         try {
+            // set models.
+            $this->export = Mage::getModel('ir_neatly/reports_export', $this->options);
+            $this->salesReport = Mage::getModel('ir_neatly/reports_sales', $this->options);
+            $this->reporting = Mage::getModel('ir_neatly/reports_reporting', $this->options);
+
+            // get all stores.
+            $this->stores = $this->salesReport->getStores();
+
+            // if only 1 store returned or no store_id passed in request.
+            if (count($this->stores) == 1 || empty($this->options['store_id'])) {
+                $this->options['store_id'] = $this->stores[0]->id;
+            }
+
+            $this->salesReport->setOptions($this->options);
+            $this->customersReport = Mage::getModel('ir_neatly/reports_customers', $this->options);
 
             if (empty($this->options['to']) || empty($this->options['from'])) {
                 throw new ApiException('"to" and "from" dates required.', 400);
@@ -145,7 +146,8 @@ class IR_Neatly_IndexController extends Mage_Core_Controller_Front_Action
                     $actions['attributes'],
                     $actions['categories'],
                     $actions['sales_by_type_stats'],
-                    $actions['product_by_sku']
+                    $actions['product_by_sku'],
+                    $actions['export']
                 );
                 foreach ($actions as $action => $method) {
                     $resp[$action] = $this->{$method}();
@@ -299,6 +301,11 @@ class IR_Neatly_IndexController extends Mage_Core_Controller_Front_Action
     public function getCategories()
     {
         return $this->reporting->getCategories();
+    }
+
+    public function getExport()
+    {
+        return $this->export->get();
     }
 
     protected function getStores()

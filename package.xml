@@ -1,7 +1,7 @@
 <?xml version="1.0"?>
 <package>
     <name>IR_Neatly_Reporting</name>
-    <version>1.1.0.0</version>
+    <version>1.1.1.0</version>
     <stability>stable</stability>
     <license uri="http://www.gnu.org/copyleft/gpl.html">GNU General Public License (GPL)</license>
     <channel>community</channel>
@@ -10,46 +10,37 @@
     <description>This extension allows Neatly to pull and generate detailed reports about your sales, customers and products.&#xD;
 &#xD;
 Simply install the extension and enter your API key and you will be able to view the following data:&#xD;
-&lt;br /&gt;&#xD;
 &#xD;
 &lt;ul&gt;&#xD;
-&lt;li&gt;Sales Overview&lt;/li&gt;&#xD;
-&lt;li&gt;Sales by Category&lt;/li&gt;&#xD;
-&lt;li&gt;Top Products&lt;/li&gt;&#xD;
-&lt;li&gt;Sales by Customer Group&lt;/li&gt;&#xD;
-&lt;li&gt;Sales by City&lt;/li&gt;&#xD;
-&lt;li&gt;Sales by Hour&lt;/li&gt;&#xD;
-&lt;li&gt;Sales by Day&lt;/li&gt;&#xD;
-&lt;li&gt;New vs Returning Customers&lt;/li&gt;&#xD;
-&lt;li&gt;Sales by Payment Type&lt;/li&gt;&#xD;
-&lt;li&gt;Sales by Country&lt;/li&gt;&#xD;
+   &lt;li&gt;Sales Overview&lt;/li&gt;&#xD;
+   &lt;li&gt;Sales by Category&lt;/li&gt;&#xD;
+   &lt;li&gt;Top Products&lt;/li&gt;&#xD;
+   &lt;li&gt;Sales by Customer Group&lt;/li&gt;&#xD;
+   &lt;li&gt;Sales by City&lt;/li&gt;&#xD;
+   &lt;li&gt;Sales by Hour&lt;/li&gt;&#xD;
+   &lt;li&gt;Sales by Day&lt;/li&gt;&#xD;
+   &lt;li&gt;New vs Returning Customers&lt;/li&gt;&#xD;
+   &lt;li&gt;Sales by Payment Type&lt;/li&gt;&#xD;
+   &lt;li&gt;Sales by Country&lt;/li&gt;&#xD;
 &lt;/ul&gt;&#xD;
-&#xD;
 You can also compare data against previous period of custom your date range comparison.&#xD;
-&#xD;
 You can also create your own dashboard and compare against a wide range of metrics including Google Analytics.&#xD;
-&#xD;
 Customer Search Filter&#xD;
-&#xD;
-Want to send targeted emails to a specific group of customers?  &#xD;
-&#xD;
+Want to send targeted emails to a specific group of customers?&#xD;
 Use our customer search feature to segment your customers and export as a CSV or export directly to Mailchimp.&#xD;
-&#xD;
 Search for customers based on:&#xD;
-&lt;br /&gt;&#xD;
-&#xD;
 &lt;ul&gt;&#xD;
-&lt;li&gt;Number of Orders&lt;/li&gt;&#xD;
-&lt;li&gt;Order Value&lt;/li&gt;&#xD;
-&lt;li&gt;Product SKU&lt;/li&gt;&#xD;
-&lt;li&gt;City/Postcode&lt;/li&gt;&#xD;
+   &lt;li&gt;Number of Orders&lt;/li&gt;&#xD;
+   &lt;li&gt;Order Value&lt;/li&gt;&#xD;
+   &lt;li&gt;Product SKU&lt;/li&gt;&#xD;
+   &lt;li&gt;City/Postcode&lt;/li&gt;&#xD;
 &lt;/ul&gt;&#xD;
 So if you want to reward your top customers or determine who has shopped with you for a while then this is the tool for you.</description>
-    <notes>You can now view total sales by product SKU, category or attribute using the "Product Search" feature.</notes>
+    <notes>Added extension version number to admin configuration.</notes>
     <authors><author><name>Jon Leighton</name><user>iResources</user><email>j.leighton@i-resources.co.uk</email></author></authors>
-    <date>2015-08-17</date>
-    <time>14:44:53</time>
-    <contents><target name="magecommunity"><dir name="IR"><dir name="Neatly"><dir name="Exception"><file name="Api.php" hash="079a77634e425c151fcc97e9d67a2ebf"/></dir><dir name="Helper"><file name="Data.php" hash="becc783e4402b1afc002f1a38e236d9b"/></dir><dir name="Model"><dir name="Reports"><file name="Abstract.php" hash="5b908c879ffa6974085fedb19b530959"/><file name="Customers.php" hash="f6af2cf717dbb7d121d643d1171d6ccf"/><file name="Reporting.php" hash="90cf8bc74cde479b2ddeda3419a0679b"/><file name="Sales.php" hash="6b0fb8adb0ec9cbf283508fe59adb797"/></dir></dir><dir name="controllers"><file name="IndexController.php" hash="4d6501eb4031f4b42bf041a9a8090486"/></dir><dir name="etc"><file name="adminhtml.xml" hash="98b2b738856967354adade75f1830a9c"/><file name="config.xml" hash="33268e3951cce566d47534e7114cbe60"/><file name="system.xml" hash="3f13f3b44d36643f8bb9822a64ce4c29"/></dir><file name=".DS_Store" hash="601020d0d1c6b7a09b8efd396666f583"/></dir></dir></target><target name="mageetc"><dir name="modules"><file name="IR_Neatly.xml" hash="8cfc6d5b71ff25155628d065d6a7335b"/></dir></target></contents>
+    <date>2015-11-02</date>
+    <time>16:43:50</time>
+    <contents><target name="magecommunity"><dir name="IR"><dir name="Neatly"><dir name="Block"><dir name="Adminhtml"><file name="Version.php" hash="792a2ccf75775467ea34bbbf5df833c6"/></dir></dir><dir name="Controllers"><file name="IndexController.php" hash="27414d6c02230a52e64b457783d58273"/></dir><dir name="Exception"><file name="Api.php" hash="079a77634e425c151fcc97e9d67a2ebf"/></dir><dir name="Helper"><file name="Data.php" hash="c794f5a53f13b818dc9f200238773333"/></dir><dir name="Model"><dir name="Reports"><file name="Abstract.php" hash="5b908c879ffa6974085fedb19b530959"/><file name="Customers.php" hash="f6af2cf717dbb7d121d643d1171d6ccf"/><file name="Export.php" hash="dd905d7aa3ecbdc0e4e7ffa37d586c86"/><file name="Reporting.php" hash="86a6d7066041ce3e7206d6059c986da3"/><file name="Sales.php" hash="6b0fb8adb0ec9cbf283508fe59adb797"/></dir></dir><dir name="etc"><file name="adminhtml.xml" hash="98b2b738856967354adade75f1830a9c"/><file name="config.xml" hash="33268e3951cce566d47534e7114cbe60"/><file name="system.xml" hash="cc0b1f5b0b6d340fabb3c221161436a7"/></dir></dir></dir></target><target name="mageetc"><dir name="modules"><file name="IR_Neatly.xml" hash="8cfc6d5b71ff25155628d065d6a7335b"/></dir></target></contents>
     <compatible/>
     <dependencies><required><php><min>5.4.0</min><max>5.6.9</max></php></required></dependencies>
 </package>
